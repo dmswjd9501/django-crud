@@ -85,7 +85,8 @@ Migrations for 'articles':
 ```bash
 $ python manage.py showmigrations
 articles
-  [] 0001_initial
+  [ ] 0001_initial
+  # [ ]: 반영되어 있지 않은 것
 ```
 
 ### 3. DB 반영(migrate)

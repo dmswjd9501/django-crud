@@ -2,7 +2,8 @@
 
 {% block body %}
 <h1>글 수정하기</h1>
-<form action="{% url 'articles:update' article.pk %}">
+<form action="{% url 'articles:update' article.pk %}" method="POST">
+  {% csrf_token %}
   <div class="form-group">
     <label for="exampleInputEmail1">제목</label>
     <input name="title" value="{{ article.title }}" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="제목을 입력하세요.">

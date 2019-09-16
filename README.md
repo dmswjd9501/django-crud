@@ -29,7 +29,7 @@
 
   
 
-* pip - `requirements.txt` 확인
+* pip - `requirements.txt` 확인 
 
   * 현재 패키지 리스트 작성
 

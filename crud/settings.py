@@ -32,13 +32,14 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'articles',
-    'django.contrib.admin',
+    'django.contrib.admin', # admin
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
+    'django.contrib.messages', # message framework
     'django.contrib.staticfiles',
     'django_extensions',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +121,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

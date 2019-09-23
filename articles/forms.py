@@ -1,5 +1,6 @@
 from django import forms
 from .models import Article
+from .models import Comment
 
 
 class ArticleForm(forms.ModelForm):
@@ -14,6 +15,15 @@ class ArticleForm(forms.ModelForm):
             }
         )
     )
+    content = forms.CharField(
+        label='내용',
+        widget=forms.Textarea(
+            attrs={
+                'placeholder': '내용을 입력바랍니다.'
+            }
+        )
+    )
+    
     class Meta:
         model = Article
         fields = '__all__'
@@ -51,3 +61,9 @@ class ArticleForm(forms.ModelForm):
 #             }
 #         )
 #     )
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+        exclude = ('article', )

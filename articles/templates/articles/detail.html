@@ -1,4 +1,5 @@
 {% extends 'articles/base.html' %}
+{% load bootstrap4 %}
 {% block body %}
 <h1>{{ article.id }}번 글</h1>
 <h2>{{ article.title }}</h2>
@@ -9,7 +10,7 @@
 <!-- a tag : GET -->
 <a href="{% url 'articles:index' %}">목록으로</a>
 <form action="{% url 'articles:delete' article.pk %}" method="POST" 
-onclick="return confirm('진짜 지울래?')">
+onclick="return confirm('정말 삭제하시겠습니까?')">
     {% csrf_token %}
     <input type="submit" value="삭제">
 </form>
@@ -19,18 +20,22 @@ onclick="return confirm('진짜 지울래?')">
 <h4>댓글 수 : {{ comments.count }}</h4>
 <form action="{% url 'articles:comment_create' article.pk %}" method="POST">
     {% csrf_token %}
-    <input type="text" name="comment_content">
+    {{ comment_form.as_p }}
+    <!-- <input type="text" name="comment_content"> -->
     <input type="submit" value="작성">
 </form>
-{% for comment in comments %}
+
+
+<!-- {% for comment in comments %}
     <li>{{ comment.content }}</li>
     <li>{{ comment.created_at }}</li>
     <hr>
 {% empty %}
     <p>댓글이 없습니다.</p>
-{% endfor %}
+{% endfor %} -->
 
 {% for comment in article.comment_set.all %}
+    <hr>
     <li>{{ comment.content }}</li>
     <li>{{ comment.created_at }}</li>
     <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" 
@@ -39,6 +44,8 @@ onclick="return confirm('진짜 지울래?')">
         <input type="submit" value="삭제">
     </form>
     <hr>
+{% empty %}
+    <p>댓글이 없습니다.</p>
 {% endfor %}
 
 {% endblock %}

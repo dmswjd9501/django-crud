@@ -1,6 +1,8 @@
 
 {% extends 'articles/base.html' %}
 {% load bootstrap4 %}
+<!-- load는 맨 앞줄에 위치하면 안된다. 오류 내용 : extends: ~~(상속과 관련된 부분) 은 반드시 첫번째 줄에 위치 -->
+<!-- 또한 load는 base.html에 넣을 수 없다 (상속 불가능) : 해당하는 template에 넣어줘야함  -->
 {% block body %}
 {% if request.resolver_match.url_name == 'create' %}
   <h1 class="text-center">글 작성하기</h1>

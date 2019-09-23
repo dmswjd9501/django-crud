@@ -1,9 +1,10 @@
 from IPython import embed
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
 
 from .forms import ArticleForm
+from .forms import CommentForm
 from .models import Article, Comment
 
 
@@ -44,17 +45,21 @@ def create(request):
     return render(request, 'articles/form.html', context)
 
 def detail(request, article_pk):
-    article = Article.objects.get(pk=article_pk)
+    # article = Article.objects.get(pk=article_pk)
+    article = get_object_or_404(Article, pk=article_pk)
     comments = article.comment_set.all()
+    comment_form = CommentForm()
     context = {
         'article': article,
         'comments': comments,
+        'comment_form' : comment_form,
     }
     return render(request, 'articles/detail.html', context)
 
 @require_POST
 def delete(request, article_pk):
-    article = Article.objects.get(pk=article_pk)
+    # article = Article.objects.get(pk=article_pk)
+    article = get_object_or_404(Article, pk=article_pk) # 더 정확한 상태코드를 알려주기 위해서 지정
     # if request.method == 'POST':
     article.delete()
     return redirect('articles:index')
@@ -67,9 +72,10 @@ def delete(request, article_pk):
 #         'article': article
 #     }
 #     return render(request, 'articles/edit.html', context)
-\
+
 def update(request, article_pk):
-    article = Article.objects.get(pk=article_pk)
+    # article = Article.objects.get(pk=article_pk)
+    article = get_object_or_404(Article, pk=article_pk)
     if request.method == 'POST':
         article_form = ArticleForm(request.POST, instance=article) # 수정할 대상 : instance=article
         if article_form.is_valid():
@@ -86,13 +92,30 @@ def update(request, article_pk):
 
 @require_POST
 def comment_create(request, article_pk):
-    article = Article.objects.get(pk=article_pk)
-    comment = Comment()
-    comment.content = request.POST.get('comment_content')
-    comment.article = article
-    # comment.article_id = article_pk
-    comment.save()
+    # article = Article.objects.get(pk=article_pk)
+    article = get_object_or_404(Article, pk=article_pk)
+    # 1. modelform에 사용자 입력값 넣고
+    comment_form = CommentForm(request.POST)
+    # 2. 검증하고
+    if comment_form.is_valid():
+    # 3. 맞으면 저장
+        comment = comment_form.save(commit=False) 
+        # 'commit = False' : 인스턴스는 만들기만하고, save는 하지않는다  
+        # => 추가적인 내용을 입력한 뒤 저장하면 된다.
+        # 밑에 저장해주지 않으면 id 가 저장이 안되어있기 때문에 오류가 뜬다
+        comment.article = article
+        comment.save()
+        
+    else:
+        messages.success(request, '댓글의 형식이 맞지 않습니다.')
+    # 4. return redirect
     return redirect('articles:detail', article_pk)
+    # comment = Comment()
+    # comment.content = request.POST.get('comment_content')
+    # comment.article = article
+    # comment.article_id = article_pk
+    # comment.save()
+    
 
 @require_POST
 def comment_delete(request, article_pk, comment_pk):

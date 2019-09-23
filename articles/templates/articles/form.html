@@ -14,7 +14,7 @@
   {{ article_form.as_p }}
   <button type="submit" class="btn btn-primary">Submit</button>
 </form> -->
-<form action="" method="post" class="form">
+<form action="" method="post" class="form" enctype="multipart/form-data">
   {% csrf_token %}
   {% bootstrap_form article_form %}
   {% buttons %}

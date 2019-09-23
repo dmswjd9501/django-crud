@@ -38,6 +38,7 @@ onclick="return confirm('정말 삭제하시겠습니까?')">
     <hr>
     <li>{{ comment.content }}</li>
     <li>{{ comment.created_at }}</li>
+    <img src="{{ article.image.url }}" alt="{{ article.image.name }}">
     <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" 
     onclick="return confirm('정말 삭제하시겠습니까?')">
         {% csrf_token %}

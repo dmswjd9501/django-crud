@@ -3,10 +3,12 @@
 {% block body %}
 <h1>{{ article.id }}번 글</h1>
 <h2>{{ article.title }}</h2>
+
 <p>작성일자 : {{ article.created_at }}</p>
 <p>수정일자 : {{ article.updated_at }}</p>
 <hr>
 <p>{{ article.content }}</p>
+<div><img src="{{ article.image.url }}" alt=""></div>
 <!-- a tag : GET -->
 <a href="{% url 'articles:index' %}">목록으로</a>
 <form action="{% url 'articles:delete' article.pk %}" method="POST" 
@@ -38,7 +40,7 @@ onclick="return confirm('정말 삭제하시겠습니까?')">
     <hr>
     <li>{{ comment.content }}</li>
     <li>{{ comment.created_at }}</li>
-    <img src="{{ article.image.url }}" alt="{{ article.image.name }}">
+    <!-- <img src="{{ article.image.url }}" alt="{{ article.image.name }}"> -->
     <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" 
     onclick="return confirm('정말 삭제하시겠습니까?')">
         {% csrf_token %}

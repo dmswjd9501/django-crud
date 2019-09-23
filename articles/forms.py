@@ -1,7 +1,5 @@
 from django import forms
-from .models import Article
-from .models import Comment
-
+from .models import Article, Comment
 
 class ArticleForm(forms.ModelForm):
     # 위젯 설정 2.
@@ -22,6 +20,9 @@ class ArticleForm(forms.ModelForm):
                 'placeholder': '내용을 입력바랍니다.'
             }
         )
+    )
+    image = forms.ImageField(
+       label='이미지'
     )
     
     class Meta:

@@ -36,8 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages', # message framework
-    'django.contrib.staticfiles',
+    'django.contrib.messages', # messages framework
+    'django.contrib.staticfiles', # static file css
     'django_extensions',
     'bootstrap4',
 ]
@@ -121,5 +121,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'crud', 'assets')
+]
 # MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

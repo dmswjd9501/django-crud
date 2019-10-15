@@ -1,10 +1,12 @@
 from IPython import embed
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
 
-from .forms import ArticleForm
-from .forms import CommentForm
+
+from .forms import ArticleForm, CommentForm
+
 from .models import Article, Comment
 
 
@@ -20,29 +22,29 @@ def index(request):
 # def new(request):
 #     return render(request, 'articles/new.html')
 
-    
+@login_required
 def create(request):
-    if request.method == 'POST':
-        # POST 요청 -> 검증 및 저장
-        article_form = ArticleForm(request.POST, request.FILES)
-        # embed()
-        if article_form.is_valid():
-            # 검증에 성공하면 저장하고, 
-            # title = article_form.cleaned_data.get('title')
-            # content = article_form.cleaned_data.get('content')
-            # article = Article(title=title, content=content)
-            article = article_form.save()
-            # redirect
-            return redirect('articles:detail', article.pk)
-    else:
-    # GET 요청 -> Form
-        article_form = ArticleForm()
-    # GET -> 비어있는 Form context
-    # POST -> 검증 실패 시 에러메세지와 입력값 채워진 Form context
-    context = {
-        'article_form' : article_form
-    }
-    return render(request, 'articles/form.html', context)
+        if request.method == 'POST':
+            # POST 요청 -> 검증 및 저장
+            article_form = ArticleForm(request.POST, request.FILES)
+            # embed()
+            if article_form.is_valid():
+                # 검증에 성공하면 저장하고, 
+                # title = article_form.cleaned_data.get('title')
+                # content = article_form.cleaned_data.get('content')
+                # article = Article(title=title, content=content)
+                article = article_form.save()
+                # redirect
+                return redirect('articles:detail', article.pk)
+        else:
+        # GET 요청 -> Form
+            article_form = ArticleForm()
+        # GET -> 비어있는 Form context
+        # POST -> 검증 실패 시 에러메세지와 입력값 채워진 Form context
+        context = {
+            'article_form' : article_form
+        }
+        return render(request, 'articles/form.html', context)
 
 def detail(request, article_pk):
     # article = Article.objects.get(pk=article_pk)
@@ -56,7 +58,7 @@ def detail(request, article_pk):
     }
     return render(request, 'articles/detail.html', context)
 
-@require_POST
+@require_POST # POST 요청일때만
 def delete(request, article_pk):
     # article = Article.objects.get(pk=article_pk)
     article = get_object_or_404(Article, pk=article_pk) # 더 정확한 상태코드를 알려주기 위해서 지정

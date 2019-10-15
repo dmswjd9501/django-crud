@@ -12,7 +12,6 @@ from .models import Article, Comment
 @require_GET
 def index(request):
     articles = Article.objects.order_by('-id')
-    embed()
     context = {
         'articles': articles
     }

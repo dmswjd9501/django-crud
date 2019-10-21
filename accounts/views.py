@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-
-
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserChangeForm
 # Create your views here.
 def signup(request):
     if request.user.is_authenticated:
@@ -20,7 +21,7 @@ def signup(request):
     context = {
         'form': form
     }
-    return render(request, 'accounts/signup.html', context)
+    return render(request, 'accounts/form.html', context)
     # 만약 POST 요청 -> 검증 실패하면 6 7 8 14 15 16 17 순서대로 실행 
     # 만약 GET 요청 -> 11 12 14 15 16 17 실행
     # 그때 form은 7번 라인의 request.POST 값 그대로 나타내주게!
@@ -43,3 +44,36 @@ def login(request):
 def logout(request):
     auth_logout(request)
     return redirect('articles:index')
+
+@login_required
+def update(request):
+    if request.method == 'POST':
+        # 1. 사용자가 보낸 내용 담아서
+        form = CustomUserChangeForm(request.POST, instance=request.user)
+        # 2. 검증
+        if form.is_valid():
+            form.save()
+            return redirect('articles:index')
+        # 3. 반영
+    else:
+        form = CustomUserChangeForm(instance=request.user)
+    context = {
+        'form': form
+    }
+    return render(request, 'accounts/form.html', context)
+
+@login_required
+def password_change(request):
+    # passwordchangeForm 상속받아
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user) # form에 담긴 유저 정보
+            return redirect('articles:index')
+    else:
+        form = PasswordChangeForm(request.user) # 반드시 첫번째 인자로 user
+    context = {
+        'form' : form
+    }
+    return render(request, 'accounts/form.html', context)

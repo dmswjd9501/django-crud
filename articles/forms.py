@@ -21,13 +21,14 @@ class ArticleForm(forms.ModelForm):
             }
         )
     )
-    image = forms.ImageField(
-       label='이미지'
-    )
+    # image = forms.ImageField(
+    #    label='이미지'
+    # )
     
     class Meta:
         model = Article
         fields = '__all__'
+        exclude = ('user', )
         # fields = ('title', )
         # exclude = ('title', )
         # 위젯 설정 1.
@@ -67,4 +68,4 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = '__all__'
-        exclude = ('article', )
+        exclude = ('article', 'user', )

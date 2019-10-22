@@ -8,24 +8,36 @@
 <p>수정일자 : {{ article.updated_at }}</p>
 <hr>
 <p>{{ article.content }}</p>
-<div><img src="{{ article.image.url }}" alt=""></div>
-<!-- a tag : GET -->
+
+{% if article.image %}
+    <div><img src="{{ article.image.url }}" alt=""></div>
+{% endif %}
+
 <a href="{% url 'articles:index' %}">목록으로</a>
-<form action="{% url 'articles:delete' article.pk %}" method="POST" 
-onclick="return confirm('정말 삭제하시겠습니까?')">
-    {% csrf_token %}
-    <input type="submit" value="삭제">
-</form>
-<a href="{% url 'articles:update' article.pk %}">수정하기</a>
+
+{% if article.user == request.user %}
+    <form action="{% url 'articles:delete' article.pk %}" method="POST" 
+    onclick="return confirm('정말 삭제하시겠습니까?')">
+        {% csrf_token %}
+        <input type="submit" value="삭제">
+    </form>
+    <a href="{% url 'articles:update' article.pk %}">수정하기</a>
+{% endif %}
+
+
 <hr>
 <h3>댓글 작성 </h3>
 <h4>댓글 수 : {{ comments.count }}</h4>
-<form action="{% url 'articles:comment_create' article.pk %}" method="POST">
-    {% csrf_token %}
-    {{ comment_form.as_p }}
-    <!-- <input type="text" name="comment_content"> -->
-    <input type="submit" value="작성">
-</form>
+<hr>
+
+{% if article.user %}
+    <form action="{% url 'articles:comment_create' article.pk %}" method="POST">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <!-- <input type="text" name="comment_content"> -->
+        <input type="submit" value="작성">
+    </form>
+{% endif %}
 
 
 <!-- {% for comment in comments %}
@@ -38,15 +50,18 @@ onclick="return confirm('정말 삭제하시겠습니까?')">
 
 {% for comment in article.comment_set.all %}
     <hr>
-    <li>{{ comment.content }}</li>
-    <li>{{ comment.created_at }}</li>
-    <!-- <img src="{{ article.image.url }}" alt="{{ article.image.name }}"> -->
-    <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" 
-    onclick="return confirm('정말 삭제하시겠습니까?')">
-        {% csrf_token %}
-        <input type="submit" value="삭제">
-    </form>
+    <li>{{comment.user.username }} : {{ comment.content }}</li>
+    <li>일시 : {{ comment.created_at }}</li>
+
+    {% if comment.user == request.user %}
+        <form action="{% url 'articles:comment_delete' article.pk comment.pk %}" method="POST" 
+        onclick="return confirm('정말 삭제하시겠습니까?')">
+            {% csrf_token %}
+            <input type="submit" value="삭제">
+        </form>
+    {% endif %}
     <hr>
+
 {% empty %}
     <p>댓글이 없습니다.</p>
 {% endfor %}

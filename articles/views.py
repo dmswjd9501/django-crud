@@ -3,10 +3,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST, require_GET
-
-
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseForbidden
+# from accounts.models import User
+# 위와 100% 동일한것
+# 확장 가능성을 위해서 User 빼놓고 써라
+from django.contrib.auth import get_user_model
 from .forms import ArticleForm, CommentForm
-
 from .models import Article, Comment
 
 
@@ -33,7 +36,9 @@ def create(request):
                 # title = article_form.cleaned_data.get('title')
                 # content = article_form.cleaned_data.get('content')
                 # article = Article(title=title, content=content)
-                article = article_form.save()
+                article = article_form.save(commit=False)
+                article.user = request.user
+                article.save()
                 # redirect
                 return redirect('articles:detail', article.pk)
         else:
@@ -58,15 +63,15 @@ def detail(request, article_pk):
     }
     return render(request, 'articles/detail.html', context)
 
+
 @require_POST # POST 요청일때만
 def delete(request, article_pk):
-    # article = Article.objects.get(pk=article_pk)
     article = get_object_or_404(Article, pk=article_pk) # 더 정확한 상태코드를 알려주기 위해서 지정
-    # if request.method == 'POST':
-    article.delete()
-    return redirect('articles:index')
-    # else:
-    #     return redirect('articles:detail', article.pk)
+    if article.user == request.user:
+        article.delete()
+        return redirect('articles:index')
+    else:
+        raise PermissionDenied
 
 # def edit(request, article_pk):
 #     article = Article.objects.get(pk=article_pk)
@@ -76,20 +81,22 @@ def delete(request, article_pk):
 #     return render(request, 'articles/edit.html', context)
 
 def update(request, article_pk):
-    # article = Article.objects.get(pk=article_pk)
     article = get_object_or_404(Article, pk=article_pk)
-    if request.method == 'POST':
-        article_form = ArticleForm(request.POST, instance=article) # 수정할 대상 : instance=article
-        if article_form.is_valid():
-            article = article_form.save()
-            return redirect('articles:detail', article.pk)
-    else:
-        article_form = ArticleForm(instance=article)
+    if article.user == request.user:
+        if request.method == 'POST':
+            article_form = ArticleForm(request.POST, instance=article) # 수정할 대상 : instance=article
+            if article_form.is_valid():
+                article = article_form.save()
+                return redirect('articles:detail', article.pk)
+        else:
+            article_form = ArticleForm(instance=article)
 
-    context = {
-        'article_form': article_form
-    }
-    return render(request, 'articles/form.html', context)
+        context = {
+            'article_form': article_form
+        }
+        return render(request, 'articles/form.html', context)
+    else:
+        return HttpResponseForbidden()
 
 
 @require_POST
@@ -105,6 +112,7 @@ def comment_create(request, article_pk):
         # 'commit = False' : 인스턴스는 만들기만하고, save는 하지않는다  
         # => 추가적인 내용을 입력한 뒤 저장하면 된다.
         # 밑에 저장해주지 않으면 id 가 저장이 안되어있기 때문에 오류가 뜬다
+        comment.user = request.user
         comment.article = article
         comment.save()
         
@@ -122,7 +130,9 @@ def comment_create(request, article_pk):
 @require_POST
 def comment_delete(request, article_pk, comment_pk):
     comment = Comment.objects.get(pk=comment_pk)
-    comment.delete()
-    # messages.add_message(request, messages.INFO, '댓글이 삭제 되었습니다.')
-    messages.success(request, '댓글이 삭제되었습니다.')
-    return redirect('articles:detail', article_pk)
+    if request.user == comment.user:
+        comment.delete()
+        messages.success(request, '댓글이 삭제되었습니다.')
+        return redirect('articles:detail', article_pk)
+    else:
+        return HttpResponseForbidden()

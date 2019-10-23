@@ -2,33 +2,39 @@ from django import forms
 from .models import Article, Comment
 
 class ArticleForm(forms.ModelForm):
-    # 위젯 설정 2.
-    title = forms.CharField(
-        max_length=140, 
-        label='제목',
-        help_text='140자 이내로 작성바랍니다.',
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': '제목을 입력바랍니다.'
-            }
-        )
-    )
-    content = forms.CharField(
-        label='내용',
-        widget=forms.Textarea(
-            attrs={
-                'placeholder': '내용을 입력바랍니다.'
-            }
-        )
-    )
-    # image = forms.ImageField(
-    #    label='이미지'
-    # )
-    
     class Meta:
         model = Article
+        fields = ('title', 'content', 'image', )
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
         fields = '__all__'
-        exclude = ('user', )
+        exclude = ('article', 'user', )
+
+# class ArticleForm(forms.ModelForm):
+#     # 위젯 설정 2.
+#     title = forms.CharField(
+#         max_length=140, 
+#         label='제목',
+#         help_text='140자 이내로 작성바랍니다.',
+#         widget=forms.TextInput(
+#             attrs={
+#                 'placeholder': '제목을 입력바랍니다.'
+#             }
+#         )
+#     )
+#     content = forms.CharField(
+#         label='내용',
+#         widget=forms.Textarea(
+#             attrs={
+#                 'placeholder': '내용을 입력바랍니다.'
+#             }
+#         )
+#     )
+#     class Meta:
+#         model = Article
+#         fields = '__all__'
         # fields = ('title', )
         # exclude = ('title', )
         # 위젯 설정 1.
@@ -63,9 +69,3 @@ class ArticleForm(forms.ModelForm):
 #             }
 #         )
 #     )
-
-class CommentForm(forms.ModelForm):
-    class Meta:
-        model = Comment
-        fields = '__all__'
-        exclude = ('article', 'user', )

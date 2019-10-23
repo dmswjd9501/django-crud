@@ -1,18 +1,30 @@
 {% extends 'articles/base.html' %}
 {% load bootstrap4 %}
 {% block body %}
-<h1>{{ article.id }}번 글</h1>
-<h2>{{ article.title }}</h2>
+<h4>{{ article.id }}번 글</h4>
+<h1>{{ article.title }}</h1>
 
-<p>작성일자 : {{ article.created_at }}</p>
-<p>수정일자 : {{ article.updated_at }}</p>
-<hr>
 <p>{{ article.content }}</p>
-
 {% if article.image %}
     <div><img src="{{ article.image.url }}" alt=""></div>
 {% endif %}
+<hr>
 
+<p>작성일자 : {{ article.created_at }}</p>
+<p>수정일자 : {{ article.updated_at }}</p>
+<p>작성자 : {{ article.user }}</p>
+<hr>
+<p>{{ article.like_users.count }}명이 이 글을 좋아합니다.</p>
+
+
+<a href="{% url 'articles:like' article.pk %}">
+    {% if user in article.like_users.all %}
+        <i class="far fa-heart fa-2x" style="color:pink"></i>
+    {% else %}
+        <i class="fas fa-heart fa-2x" style="color:pink"></i>
+    {% endif %}
+</a>
+<hr><hr>
 <a href="{% url 'articles:index' %}">목록으로</a>
 
 {% if article.user == request.user %}
@@ -30,7 +42,7 @@
 <h4>댓글 수 : {{ comments.count }}</h4>
 <hr>
 
-{% if article.user %}
+{% if user.is_authenticated %}
     <form action="{% url 'articles:comment_create' article.pk %}" method="POST">
         {% csrf_token %}
         {{ comment_form.as_p }}

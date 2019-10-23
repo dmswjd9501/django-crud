@@ -25,6 +25,19 @@ def index(request):
 # def new(request):
 #     return render(request, 'articles/new.html')
 
+def detail(request, article_pk):
+    # article = Article.objects.get(pk=article_pk)
+    article = get_object_or_404(Article, pk=article_pk)
+    comments = article.comment_set.all()
+    comment_form = CommentForm()
+    context = {
+        'article': article,
+        'comments': comments,
+        'comment_form' : comment_form,
+    }
+    return render(request, 'articles/detail.html', context)
+
+
 @login_required
 def create(request):
         if request.method == 'POST':
@@ -51,17 +64,7 @@ def create(request):
         }
         return render(request, 'articles/form.html', context)
 
-def detail(request, article_pk):
-    # article = Article.objects.get(pk=article_pk)
-    article = get_object_or_404(Article, pk=article_pk)
-    comments = article.comment_set.all()
-    comment_form = CommentForm()
-    context = {
-        'article': article,
-        'comments': comments,
-        'comment_form' : comment_form,
-    }
-    return render(request, 'articles/detail.html', context)
+
 
 
 @require_POST # POST 요청일때만
@@ -101,30 +104,33 @@ def update(request, article_pk):
 
 @require_POST
 def comment_create(request, article_pk):
-    # article = Article.objects.get(pk=article_pk)
-    article = get_object_or_404(Article, pk=article_pk)
-    # 1. modelform에 사용자 입력값 넣고
-    comment_form = CommentForm(request.POST)
-    # 2. 검증하고
-    if comment_form.is_valid():
-    # 3. 맞으면 저장
-        comment = comment_form.save(commit=False) 
-        # 'commit = False' : 인스턴스는 만들기만하고, save는 하지않는다  
-        # => 추가적인 내용을 입력한 뒤 저장하면 된다.
-        # 밑에 저장해주지 않으면 id 가 저장이 안되어있기 때문에 오류가 뜬다
-        comment.user = request.user
-        comment.article = article
-        comment.save()
-        
+    if request.user.is_authenticated:
+        # article = Article.objects.get(pk=article_pk)
+        article = get_object_or_404(Article, pk=article_pk)
+        # 1. modelform에 사용자 입력값 넣고
+        comment_form = CommentForm(request.POST)
+        # 2. 검증하고
+        if comment_form.is_valid():
+        # 3. 맞으면 저장
+            comment = comment_form.save(commit=False) 
+            # 'commit = False' : 인스턴스는 만들기만하고, save는 하지않는다  
+            # => 추가적인 내용을 입력한 뒤 저장하면 된다.
+            # 밑에 저장해주지 않으면 id 가 저장이 안되어있기 때문에 오류가 뜬다
+            comment.user = request.user
+            comment.article = article
+            comment.save()
+            
+        else:
+            messages.success(request, '댓글의 형식이 맞지 않습니다.')
+        # 4. return redirect
+        return redirect('articles:detail', article_pk)
+        # comment = Comment()
+        # comment.content = request.POST.get('comment_content')
+        # comment.article = article
+        # comment.article_id = article_pk
+        # comment.save()
     else:
-        messages.success(request, '댓글의 형식이 맞지 않습니다.')
-    # 4. return redirect
-    return redirect('articles:detail', article_pk)
-    # comment = Comment()
-    # comment.content = request.POST.get('comment_content')
-    # comment.article = article
-    # comment.article_id = article_pk
-    # comment.save()
+        return HttpResponse('Unauthorized', status=401)
     
 
 @require_POST
@@ -136,3 +142,18 @@ def comment_delete(request, article_pk, comment_pk):
         return redirect('articles:detail', article_pk)
     else:
         return HttpResponseForbidden()
+
+
+@login_required
+def like(request, article_pk):
+    article = get_object_or_404(Article, pk=article_pk)
+    # 좋아요를 누른적이 있다면?
+    if request.user in article.like_users.all():
+    # if article.like_users.filter(id=request.user.id).exist():
+        # 좋아요 취소 로직
+        article.like_users.remove(request.user)
+    # 아니면
+    else:
+        # 좋아요 로직
+        article.like_users.add(request.user)
+    return redirect('articles:detail', article_pk)

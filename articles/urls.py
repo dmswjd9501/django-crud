@@ -18,4 +18,5 @@ urlpatterns = [
         views.comment_delete, 
         name='comment_delete'),
     # articles/5/comments/3/delete : 5번 글에 있는 댓글 3을 삭제 하자!
+    path('<int:article_pk>/like/', views.like, name='like'),
 ]

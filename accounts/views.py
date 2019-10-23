@@ -1,10 +1,14 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
+
+
 from .forms import CustomUserChangeForm, CustomUserCreationForm
+
 # Create your views here.
 def signup(request):
     if request.user.is_authenticated:
@@ -77,3 +81,13 @@ def password_change(request):
         'form' : form
     }
     return render(request, 'accounts/form.html', context)
+
+@login_required
+def profile(request, account_pk):
+    # user = User.objects.get(pk=account_pk)
+    User = get_user_model()
+    user = get_object_or_404(User, pk=account_pk)
+    context = {
+        'user_profile' : user
+    }
+    return render(request, 'accounts/profile.html', context)

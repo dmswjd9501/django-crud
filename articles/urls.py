@@ -14,9 +14,7 @@ urlpatterns = [
     # path('<int:article_pk>/edit/', views.edit, name='edit'),
     path('<int:article_pk>/update/', views.update, name='update'),
     path('<int:article_pk>/comments/create/', views.comment_create, name='comment_create'),
-    path('<int:article_pk>/comments/<int:comment_pk>/delete/', 
-        views.comment_delete, 
-        name='comment_delete'),
+    path('<int:article_pk>/comments/<int:comment_pk>/delete/', views.comment_delete, name='comment_delete'), 
     # articles/5/comments/3/delete : 5번 글에 있는 댓글 3을 삭제 하자!
     path('<int:article_pk>/like/', views.like, name='like'),
 ]

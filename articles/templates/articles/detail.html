@@ -1,5 +1,6 @@
 {% extends 'articles/base.html' %}
 {% load bootstrap4 %}
+
 {% block body %}
 <h4>{{ article.id }}번 글</h4>
 <h1>{{ article.title }}</h1>
@@ -13,6 +14,8 @@
 <p>작성일자 : {{ article.created_at }}</p>
 <p>수정일자 : {{ article.updated_at }}</p>
 <p>작성자 : {{ article.user }}</p>
+{% load hashtag %}
+<p>{{article|make_link|safe|linebreaksbr }}</p>
 <hr>
 <p>{{ article.like_users.count }}명이 이 글을 좋아합니다.</p>
 

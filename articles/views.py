@@ -10,7 +10,7 @@ from django.http import HttpResponseForbidden
 # 확장 가능성을 위해서 User 빼놓고 써라
 from django.contrib.auth import get_user_model
 from .forms import ArticleForm, CommentForm
-from .models import Article, Comment
+from .models import Article, Comment, HashTag
 
 
 # Create your views here.
@@ -50,8 +50,14 @@ def create(request):
                 # content = article_form.cleaned_data.get('content')
                 # article = Article(title=title, content=content)
                 article = article_form.save(commit=False)
-                article.user = request.user
+                article.user = request.user # user 인스턴스
                 article.save()
+                # 해시태그 저장 및 연결 작업
+                # for article.content를 잘 쪼개서 #으로 시작되는 것들
+                for element in article.content.split():
+                    if element.startswith('#'):
+                        hashtag, created = HashTag.objects.get_or_create(content=element)
+                        article.hashtags.add(hashtag)
                 # redirect
                 return redirect('articles:detail', article.pk)
         else:
@@ -90,6 +96,12 @@ def update(request, article_pk):
             article_form = ArticleForm(request.POST, instance=article) # 수정할 대상 : instance=article
             if article_form.is_valid():
                 article = article_form.save()
+                # 해시태그 수정
+                article.hashtags.clear()
+                for element in article.content.split():
+                    if element.startswith('#'):
+                        hashtag, created = HashTag.objects.get_or_create(content=element)
+                        article.hashtags.add(hashtag)
                 return redirect('articles:detail', article.pk)
         else:
             article_form = ArticleForm(instance=article)
@@ -157,3 +169,10 @@ def like(request, article_pk):
         # 좋아요 로직
         article.like_users.add(request.user)
     return redirect('articles:detail', article_pk)
+
+def hashtag(request, hashtag_pk):
+    hashtag = get_object_or_404(HashTag, pk=hashtag_pk)
+    context = {
+        'hashtag': hashtag
+    }
+    return render(request, 'articles/hashtag.html', context)

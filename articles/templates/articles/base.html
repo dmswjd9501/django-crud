@@ -27,7 +27,7 @@
     {% block body %}
     {% endblock %}
   </div>
-
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
   </script>
@@ -36,6 +36,8 @@
   </script>
   <script src="{% static 'bootstrap/js/bootstrap.min.js'%}"></script>
   <script src="https://kit.fontawesome.com/54e342cbc4.js" crossorigin="anonymous"></script>
+    {% block script %}
+    {% endblock %}
 </body>
 
 </html>

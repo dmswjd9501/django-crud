@@ -1,4 +1,3 @@
-import hashlib
 from django import template
 
 register = template.Library()
@@ -9,6 +8,9 @@ def make_link(article):
     hashtags = article.hashtags.all()
 
     for hashtag in hashtags:
-        content = content.replace(hashtag.content + ' ',
-        f'<a href="/hashtags/{hashtag.pk}/">{hashtag.content}</a> ')
+        content = re.sub(f'{hashtag.content}\\b',
+        f'<a href="/hashtags/{hashtag.pk}/">{hashtag.content}</a> ',
+        content)
+        # content = content.replace(hashtag.content + ' ',
+        # f' <a href="/hashtags/{hashtag.pk}/">{hashtag.content}</a> ')
     return content

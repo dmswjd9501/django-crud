@@ -11,6 +11,7 @@ from django.http import HttpResponseForbidden
 from django.contrib.auth import get_user_model
 from .forms import ArticleForm, CommentForm
 from .models import Article, Comment, HashTag
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -159,16 +160,24 @@ def comment_delete(request, article_pk, comment_pk):
 @login_required
 def like(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
+    like_count = article.like_users.count()
     # 좋아요를 누른적이 있다면?
+    is_liked = True
     if request.user in article.like_users.all():
     # if article.like_users.filter(id=request.user.id).exist():
         # 좋아요 취소 로직
         article.like_users.remove(request.user)
+        is_liked = False
     # 아니면
     else:
         # 좋아요 로직
         article.like_users.add(request.user)
-    return redirect('articles:detail', article_pk)
+        is_liked = True
+    context = {
+        'is_liked': is_liked,
+        'like_count': like_count
+    }
+    return JsonResponse(context)
 
 def hashtag(request, hashtag_pk):
     hashtag = get_object_or_404(HashTag, pk=hashtag_pk)

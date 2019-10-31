@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Article, Comment
+from .models import Article, Comment, HashTag
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content', 'created_at', 'updated_at')
@@ -9,6 +9,7 @@ class ArticleAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('id', 'content', 'article')
 
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Comment, CommentAdmin)
-
+admin.site.register(HashTag)

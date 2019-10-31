@@ -2,25 +2,29 @@
 {% load bootstrap4 %}
 {% block body %}
 <h1>{{ user_profile.username }}의 프로필</h1>
-<a href="{% url 'accounts:follow' user_profile.pk %}">
-    {% if user in user_profile.followers.all %}
-        팔로우 취소
-    {% else %}
-        팔로우
-    {% endif %}
-</a>
-<h2>팔로우 : {{ user_profile.followings.all.count }}</h2>
-<h2>팔로워 : {{ user_profile.followers.all.count }}</h2>
+{% with user_profile.followers.all as followers  %}
+    <a href="{% url 'accounts:follow' user_profile.pk %}">
+        {% if user in user_profile.followers.all %}
+            팔로우 취소
+        {% else %}
+            팔로우
+        {% endif %}
+    </a>
+    <h2>팔로우 : {{ user_profile.followings.all.count }}</h2>
+    <h2>팔로워 : {{ user_profile.followers.all.count }}</h2>
+{% endwith %}
+
 
 {% if user == user_profile %}
     <h2>내가 쓴 글 ({{ user_profile.article_set.all.count }})</h2>
     {% for article in user_profile.article_set.all %}
-        <a href="{% url 'articles:detail' article.pk %}">
+        <p>
+            <a href="{% url 'articles:detail' article.pk %}">
             {{ article.pk }} : {{ article.title }}
-        </a>
+            </a>
+        </p>
     {% endfor %}
     <hr>
-
     <h2>내가 쓴 댓글({{ user_profile.comment_set.all.count }})</h2>
     {% for comment in user_profile.comment_set.all %}
         <p>
@@ -39,9 +43,6 @@
             </a>
         </p>
     {% endfor %}
-    <hr>
-
-
 {% endif %}
-
+<hr>
 {% endblock %}

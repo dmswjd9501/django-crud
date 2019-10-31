@@ -5,6 +5,8 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
-    followers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='followings', blank=True)
-
-
+    followings = models.ManyToManyField(
+                    settings.AUTH_USER_MODEL, 
+                    related_name='followers',
+                    blank=True
+                    )

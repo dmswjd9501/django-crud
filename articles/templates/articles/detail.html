@@ -19,12 +19,10 @@
 <p><span id="like_cnt">{{ article.like_users.count }}</span>명이 이 글을 좋아합니다.</p>
 
 
-
-
     {% if user in article.like_users.all %}
-    <i id = "like-button" data-id="{{article.id}}" class="far fa-heart fa-2x" style="color:skyblue"></i>
+    <i id = "like-button" data-id="{{ article.id }}" class="far fa-heart fa-2x" style="color:skyblue"></i>
     {% else %}
-    <i id = "like-button" data-id="{{article.id}}" class="fas fa-heart fa-2x" style="color:skyblue"></i>
+    <i id = "like-button" data-id="{{ article.id }}" class="fas fa-heart fa-2x" style="color:skyblue"></i>
     {% endif %}
 
 <hr><hr>
@@ -85,7 +83,12 @@
     const likeButton = document.querySelector('#like-button')
     likeButton.addEventListener('click', function(event){
         console.log(event.target.dataset) // dataset으로 들어오면 위에서 정의한게 다 날아들어온다
-        axios.get(`/articles/${event.target.dataset.id}/like/`) // url을 보낼거기 때문에 그 데이터 안에서 id값이 필요하다
+        // POST 요청 csrftoken을 AJAX 요청시 설정하는 법
+        axios.defaults.xsrfCookieName = 'csrftoken'
+        axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+        // django is_ajax() 분기가 되는 기준이 아래의 헤더 설정에 따라서 진행
+        axios.defaults.headers.common['X-REQUESTED-WITH'] = 'XMLHttpRequest'
+        axios.post(`/articles/${event.target.dataset.id}/like/`) // url을 보낼거기 때문에 그 데이터 안에서 id값이 필요하다
             .then(response => {
                 const likeCnt = document.querySelector('#like_cnt')
                 console.log(response)
@@ -100,6 +103,9 @@
                         event.target.classList.add('far')
                     }          
                 likeCnt.innerText = response.data.like_count
+            })
+            .catch(error => {
+                console.log(error)
             })
         })
 </script>
